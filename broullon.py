@@ -102,3 +102,4 @@ m_draw_betkeen=(3*draw_betkeen)/(3-marge*draw_betkeen)
 print(marge)
 
 
+print("lol")

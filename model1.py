@@ -9,10 +9,7 @@ import asyncio
 from datetime import datetime, timedelta
 
 
-with open ("nombre_surbet.pickle",'rb') as f:
-	
-	n=pickle.load(f)
-pprint(n)
+
 
 from pprint import pprint
 
@@ -96,3 +93,5 @@ def mongodbParking():
 	print(list(collection1.find()))
 
 mongodbParking()
+
+client.close()

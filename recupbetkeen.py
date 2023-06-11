@@ -149,4 +149,4 @@ import subprocess
 subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\donnee.py'])
 subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\traitement.py'])
 
-#client.close()
+client.close()
