@@ -181,7 +181,7 @@ browser.quit()
 with open('nbrerow.pickle', 'wb') as f:
     pickle.dump(recuperer_chiffre(soccerListing1), f)
 '''
-#client.close()
+client.close()
 
 
 
