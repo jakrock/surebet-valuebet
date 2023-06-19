@@ -151,11 +151,18 @@ subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\
 subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\handicapModel.py'])
 subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\over_under_0_5model.py'])
 subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\over_under_1_5model.py'])
-subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\over_under_1_5model.py'])
 subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\half_0.5_model.py'])
 subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\half_1.5_model.py'])
 subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\half_2.5_model.py'])
 subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\halfmodel.py'])
+subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\over_under_2_5model.py'])
+subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\over_under_3.5_model.py'])
+subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\over_under_4.5_model.py'])
+
+
+
+
+
 
 client.close()
 

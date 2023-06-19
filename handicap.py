@@ -19,6 +19,10 @@ import asyncio
 import aiohttp
 import httpx
 import time
+import uuid
+import sys
+#sys.stdout = open("NUL", "w")
+
 
 
 
@@ -131,13 +135,19 @@ def last_surebet():
 
 
 import aiohttp
-
+betkeen=''
+_1xbet=''
 from functools import reduce
 
 async def handicap_Traitement(a, data1, a1, *args, **kwargs):
     t = {}
     b=a.copy()
     #pprint(a1)
+    global betkeen
+    global _1xbet
+    b["betkeen"]=betkeen
+    b["1xbet"]=_1xbet
+    b["id"]=str(uuid.uuid4())
     print(kwargs.get("home_handicap"))
     print(kwargs.get("away_handicap"))
     home_handicap_betkeen = list(filter(lambda x: x["HandicapMatch"] == kwargs.get("home_handicap"), data1))[0]["Back1Odds"]
@@ -160,6 +170,7 @@ async def handicap_Traitement(a, data1, a1, *args, **kwargs):
 
     h=kwargs["home_handicap"]
     a1=kwargs["away_handicap"]
+    
     b[f"home_handicap_betkeen {h}"]=home_handicap_betkeen
     b[f"away_handicap_betkeen {a1}"]=away_handicap_betkeen
 
@@ -177,12 +188,12 @@ async def handicap_Traitement(a, data1, a1, *args, **kwargs):
         m_away_handicap_betkeen=(2*away_handicap_betkeen)/(2-marge*away_handicap_betkeen)
 
 
-        if (home_handicap_betkeen>m_home_handicap_betkeen) and ( home_handicap_betkeen - m_home_handicap_betkeen > 0.1):
+        if (home_handicap_betkeen>m_home_handicap_betkeen) and ( home_handicap_betkeen - m_home_handicap_betkeen > 0.02):
             value_home_handicap_1xbet=home_handicap_1xbet
             print(value_home_handicap_1xbet)
 
 
-        if (away_handicap_betkeen>m_away_handicap_betkeen) and ( away_handicap_betkeen - m_away_handicap_betkeen > 0.1):
+        if (away_handicap_betkeen>m_away_handicap_betkeen) and ( away_handicap_betkeen - m_away_handicap_betkeen > 0.02):
             value_away_handicap_1xbet=away_handicap_1xbet
             print(value_away_handicap_1xbet)
 
@@ -206,23 +217,38 @@ async def handicap_Traitement(a, data1, a1, *args, **kwargs):
             v["h"]=h
             v["a1"]=a1
             collection3=db_handicap["valuebet"]
-            result = collection3.update_one(
-            {'id_handicap_1xbet': v["id_handicap_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"],"h":v["h"],"a1":v["a1"]},
-            {'$set': v},
-            upsert=True
-            )# Vérification du résultat
-            if result.upserted_id:
-                print("Document inséré avec succès.")
+
+
+            if list(collection3.find({'id_handicap_1xbet': v["id_handicap_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"],"h":v["h"],"a1":v["a1"]},{"_id":0})):
+                filtre={'id_handicap_1xbet': v["id_handicap_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"],"h":v["h"],"a1":v["a1"]}
+                mise_a_jour={'$set':  {k: v[k] for k in v if k != 'id'}}
+                resultat= collection3.update_one(filtre, mise_a_jour)
+                if resultat.modified_count > 0:
+                    print("Mise à jour effectuée avec succès.")
+                else:
+                    print("Aucun document mis à jour.")
+            else:
+                resultat=collection3.insert_one(v)
+                inserted_id = resultat.inserted_id
+                print("Identifiant inséré :", inserted_id)
+
+
 
             collection4=db_handicap["storage"]
-            result = collection4.update_one(
-            {'id_handicap_1xbet': v["id_handicap_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"],"h":v["h"],"a1":v["a1"]},
-            {'$set': v},
-            upsert=True
-            )# Vérification du résultat
-            if result.upserted_id:
-                print("Document inséré avec succès.")
 
+
+            if list(collection4.find({'id_handicap_1xbet': v["id_handicap_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"],"h":v["h"],"a1":v["a1"]},{"_id":0})):
+                filtre={'id_handicap_1xbet': v["id_handicap_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"],"h":v["h"],"a1":v["a1"]}
+                mise_a_jour={'$set':  {k: v[k] for k in v if k != 'id'}}
+                resultat= collection4.update_one(filtre, mise_a_jour)
+                if resultat.modified_count > 0:
+                    print("Mise à jour effectuée avec succès.")
+                else:
+                    print("Aucun document mis à jour.")
+            else:
+                resultat=collection4.insert_one(v)
+                inserted_id = resultat.inserted_id
+                print("Identifiant inséré :", inserted_id)
 
 
 
@@ -242,20 +268,25 @@ async def handicap_Traitement(a, data1, a1, *args, **kwargs):
 
     inverse_sum = reduce(lambda x, y: x + (1 / y), t.values(), 0)
     print(t,inverse_sum)
-    if inverse_sum<0.99:
+    if inverse_sum<1:
         b["possible_surebet"]=t
         b["last_update"]=time.time()
         b["ratio"]=inverse_sum
         collection2=db_handicap["surebet"]
-        result = collection2.update_one(
-        {'id_handicap_1xbet': b["id_handicap_1xbet"],"market":b["market"],"a1":b['a1'],"h":b["h"]},
-        {'$set': b},
-        upsert=True
-        )# Vérification du résultat
-        if result.upserted_id:
-            print("Document inséré avec succès.")
+
+
+        if list(collection2.find({'id_handicap_1xbet': v["id_handicap_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"],"h":v["h"],"a1":v["a1"]},{"_id":0})):
+            filtre={'id_handicap_1xbet': v["id_handicap_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"],"h":v["h"],"a1":v["a1"]}
+            mise_a_jour={'$set':  {k: v[k] for k in v if k != 'id'}}
+            resultat= collection2.update_one(filtre, mise_a_jour)
+            if resultat.modified_count > 0:
+                print("Mise à jour effectuée avec succès.")
+            else:
+                print("Aucun document mis à jour.")
         else:
-            print("Document mis à jour avec succès.")
+            resultat=collection2.insert_one(v)
+            inserted_id = resultat.inserted_id
+            print("Identifiant inséré :", inserted_id)
         pprint(list(collection2.find({},{"_id":0})))
 
 
@@ -284,6 +315,9 @@ async def handicap_recuperation(a):
 
 
 async def handicap_recuperation(a):
+
+    global betkeen
+    global _1xbet
     Id = a["id_handicap_1xbet"]
     # Le lien ici est pour les matchs en direct (liveFeed)
     url = f"https://1xbet.mobi/LiveFeed/GetGameZip?id={Id}&lng=fr&tzo=2&isSubGames=true&GroupEvents=true&countevents=250&grMode=2&country=182&marketType=1&mobi=true"
@@ -301,6 +335,11 @@ async def handicap_recuperation(a):
     except Exception as e:
         print(f'Probleme {e} au niveau de l api betkeen')
         return None
+
+    betkeen=data1["EventMarket"]
+    O1=data["Value"]["O1"]
+    O2=data["Value"]["O2"]
+    _1xbet=f"{O1} v {O2}"
     data1=data1["Selections"]
     if data1==[]:
         print("il n y a de data au niveau de l'api betkeen"  )
@@ -614,3 +653,9 @@ loop = asyncio.get_event_loop()
 loop.run_until_complete(process_data_set(resultat, batch_size, max_concurrent_tasks))
 
 
+
+client.close()
+import gc
+gc.collect()
+
+sys.exit()

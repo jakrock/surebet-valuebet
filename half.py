@@ -20,6 +20,10 @@ import aiohttp
 import httpx
 import time
 import pickle
+import uuid
+import sys
+#sys.stdout = open("NUL", "w")
+
 
 
 
@@ -122,6 +126,26 @@ def flatten(l):
         else:
             yield item
 
+
+def filtarage_valuebet():
+    db=client["finale"]
+    collection=db["data supprimer"]
+    for i in list(collection.find({},{'_id':0})) :
+        result=collection3.delete_one({'id':i["id"]})
+
+    temps=time.time()-2500
+    result1=collection.delete_many({"last_update":{"$lt":temps}})
+
+def filtarage_surbet():
+    db=client["finale"]
+    collection=db["data supprimer1"]
+    for i in list(collection.find({},{'_id':0})) :
+        result=collection2.delete_one({'id':i["id"]})
+
+    temps=time.time()-2500
+    result1=collection.delete_many({"last_update":{"$lt":temps}})
+
+
 # Cette fonction sert à supprimer les surebets qui ont 5 minutes d'existence sans être mis à jour
 def last_surebet():
     db_match_odd=client["finale"]
@@ -162,6 +186,13 @@ async def match_odd_recuperation(a):
     except Exception as e:
         print(f'Probleme {e} au niveau de l api betkeen')
         return None
+    betkeen=data1["EventMarket"]
+    O1=data["Value"]["O1"]
+    O2=data["Value"]["O2"]
+    _1xbet=f"{O1} v {O2}"
+    b["betkeen"]=betkeen
+    b["1xbet"]=_1xbet
+    b["id"]=str(uuid.uuid4())
     data1 = data1["Selections"]
     if data1==[]:
         print("il n y a de data au niveau de l'api betkeen"  )
@@ -208,13 +239,13 @@ async def match_odd_recuperation(a):
         m_away_half_betkeen=(3*away_half_betkeen)/(3-marge*away_half_betkeen)
         m_draw_half_betkeen=(3*draw_half_betkeen)/(3-marge*draw_half_betkeen)
 
-        if (home_half_1xbet > m_home_half_betkeen) and (home_half_1xbet - m_home_half_betkeen > 0.1):
+        if (home_half_1xbet > m_home_half_betkeen) and (home_half_1xbet - m_home_half_betkeen > 0.02):
             value_home_half_1xbet = home_half_1xbet
             print(value_home_half_1xbet)
-        if (away_half_1xbet > m_away_half_betkeen) and (away_half_1xbet - m_away_half_betkeen > 0.1):
+        if (away_half_1xbet > m_away_half_betkeen) and (away_half_1xbet - m_away_half_betkeen > 0.02):
             value_away_half_1xbet = away_half_1xbet
             print(value_away_half_1xbet)
-        if (draw_half_1xbet > m_draw_half_betkeen) and (draw_half_1xbet - m_draw_half_betkeen > 0.1):
+        if (draw_half_1xbet > m_draw_half_betkeen) and (draw_half_1xbet - m_draw_half_betkeen > 0.02):
             value_draw_half_1xbet = draw_half_1xbet
             print(value_draw_half_1xbet)
         print(f"le dictionnaire est le {b}")
@@ -238,23 +269,36 @@ async def match_odd_recuperation(a):
         v["last_update"]=time.time()
         if value:
 
-
             collection3=db_match_odd["valuebet"]
-            result = collection3.update_one(
-            {'id_half_1xbet': v["id_half_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"]},
-            {'$set': v},
-            upsert=True
-            )# Vérification du résultat
-            if result.upserted_id:
-                print("Document inséré avec succès.")
+            if list(collection3.find({'id_half_1xbet': v["id_half_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"]},{"_id":0})):
+                filtre={'id_half_1xbet': v["id_half_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"]}
+                mise_a_jour={'$set':  {k: v[k] for k in v if k != 'id'}}
+                resultat= collection3.update_one(filtre, mise_a_jour)
+                if resultat.modified_count > 0:
+                    print("Mise à jour effectuée avec succès.")
+                else:
+                    print("Aucun document mis à jour.")
+            else:
+                resultat=collection3.insert_one(v)
+                inserted_id = resultat.inserted_id
+                print("Identifiant inséré :", inserted_id)
+
+
+
             collection4=db_match_odd["storage"]
-            result = collection4.update_one(
-            {'id_half_1xbet': v["id_half_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"]},
-            {'$set': v},
-            upsert=True
-            )# Vérification du résultat
-            if result.upserted_id:
-                print("Document inséré avec succès.")
+            if list(collection4.find({'id_half_1xbet': v["id_half_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"]},{"_id":0})):
+                filtre={'id_half_1xbet': v["id_half_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"]}
+                mise_a_jour={'$set':  {k: v[k] for k in v if k != 'id'}}
+                resultat= collection4.update_one(filtre, mise_a_jour)
+                if resultat.modified_count > 0:
+                    print("Mise à jour effectuée avec succès.")
+                else:
+                    print("Aucun document mis à jour.")
+            else:
+                resultat=collection4.insert_one(v)
+                inserted_id = resultat.inserted_id
+                print("Identifiant inséré :", inserted_id)            
+
 
 
     # Ici, on cherche le maximum entre les cotes des deux bookmakers
@@ -276,21 +320,27 @@ async def match_odd_recuperation(a):
     inverse_sum = reduce(lambda x, y: x + (1 / y), t.values(), 0)
     print(t)
     print(inverse_sum)
-    if inverse_sum < 0.99:
+    if inverse_sum < 1:
         b["possible_surebet"] = t
         b["last_update"] = time.time()
         b["ratio"]=inverse_sum
         collection2 = db_match_odd["surebet"]
-        result = collection2.update_one(
-            {'id_half_1xbet': b["id_half_1xbet"],"market": b["market"],"events_1xbet":b["events_1xbet"]},
-            {'$set': b},
-            upsert=True
-        )  # Vérification du résultat
+
+
+
         
-        if result.upserted_id:
-            print("Document inséré avec succès.")
+        if list(collection2.find({'id_half_1xbet': b["id_half_1xbet"],"market":b["market"],"events_1xbet":b["events_1xbet"]},{"_id":0})):
+            filtre={'id_half_1xbet': b["id_half_1xbet"],"market":b["market"],"events_1xbet":b["events_1xbet"]}
+            mise_a_jour={'$set':  {k: b[k] for k in b if k != 'id'}}
+            resultat= collection2.update_one(filtre, mise_a_jour)
+            if resultat.modified_count > 0:
+                print("Mise à jour effectuée avec succès.")
+            else:
+                print("Aucun document mis à jour.")
         else:
-            print("Document mis à jour avec succès.")
+            resultat=collection2.insert_one(b)
+            inserted_id = resultat.inserted_id
+            print("Identifiant inséré :", inserted_id)
         pprint(list(collection2.find({}, {"_id": 0})))
         last_surebet()
 
@@ -367,5 +417,12 @@ max_concurrent_tasks = 10
 # Appel de la fonction asynchrone pour traiter l'ensemble de données
 loop = asyncio.get_event_loop()
 loop.run_until_complete(process_data_set(resultat, batch_size, max_concurrent_tasks))
+
+
+client.close()
+import gc
+gc.collect()
+
+sys.exit()
 
 

@@ -20,6 +20,10 @@ import httpx
 import time
 import aiohttp
 from functools import reduce
+import uuid
+import sys
+#sys.stdout = open("NUL", "w")
+
 
 
 client=pymongo.MongoClient('localhost',27017)
@@ -128,9 +132,12 @@ def last_surebet():
 def last_surebet1():
     cinq_minute=time.time()-300
     result = collection3.delete_many({"last_update": {"$lt": cinq_minute}})
-
+betkeen=''
+_1xbet=''
 
 async def over_under_traitement(a,data1,a1,*args,**kwargs):
+    global betkeen
+    global _1xbet
     last_surebet()
     last_surebet1()
     t={}
@@ -140,6 +147,10 @@ async def over_under_traitement(a,data1,a1,*args,**kwargs):
     b=[]
     b=a.copy()
     #print(goal)
+
+    b["betkeen"]=betkeen
+    b["1xbet"]=_1xbet
+    b["id"]=str(uuid.uuid4())
     over_betkeen=list(filter(lambda x: x["SelectionName"]==f"Over {goal} Goals",data1))[0]["Back1Odds"]
     under_betkeen=list(filter(lambda x: x["SelectionName"]==f"Under {goal} Goals",data1))[0]["Back1Odds"]
     
@@ -166,11 +177,11 @@ async def over_under_traitement(a,data1,a1,*args,**kwargs):
         m_over_betkeen = (2 * over_betkeen) / (2 - marge * over_betkeen)
         m_under_betkeen = (2 * under_betkeen) / (2 - marge * under_betkeen)
 
-        if (over_1xbet > m_over_betkeen) and (over_1xbet - m_over_betkeen > 0.1):
+        if (over_1xbet > m_over_betkeen) and (over_1xbet - m_over_betkeen > 0.02):
             value_over_1xbet = over_1xbet
             print(value_over_1xbet)
 
-        if (under_1xbet > m_under_betkeen) and (under_1xbet - m_under_betkeen) > 0.1:
+        if (under_1xbet > m_under_betkeen) and (under_1xbet - m_under_betkeen) > 0.02:
             value_under_1xbet = under_1xbet
             print(value_under_1xbet)
 
@@ -194,25 +205,35 @@ async def over_under_traitement(a,data1,a1,*args,**kwargs):
             v["but"]=goal
             v["last_update"]=time.time()
 
+
             collection3=db_over_under["valuebet"]
-            result = collection3.update_one(
-            {'id_half_0_5_1xbet': v["id_half_0_5_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"],"but":v["but"]},
-            {'$set': v},
-            upsert=True
-            )# Vérification du résultat
-            if result.upserted_id:
-                print("Document inséré avec succès.")
+            if list(collection3.find({'id_half_0_5_1xbet': v["id_half_0_5_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"],"but":v["but"]},{"_id":0})):
+                filtre={'id_half_0_5_1xbet': v["id_half_0_5_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"],"but":v["but"]}
+                mise_a_jour={'$set':  {k: v[k] for k in v if k != 'id'}}
+                resultat= collection3.update_one(filtre, mise_a_jour)
+                if resultat.modified_count > 0:
+                    print("Mise à jour effectuée avec succès.")
+                else:
+                    print("Aucun document mis à jour.")
+            else:
+                resultat=collection3.insert_one(v)
+                inserted_id = resultat.inserted_id
+                print("Identifiant inséré :", inserted_id)
+
 
             collection4=db_over_under["storage"]
-            result = collection4.update_one(
-            {'id_half_0_5_1xbet': v["id_half_0_5_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"],"but":v["but"]},
-            {'$set': v},
-            upsert=True
-            )# Vérification du résultat
-            if result.upserted_id:
-                print("Document inséré avec succès.")
-
-
+            if list(collection4.find({'id_half_0_5_1xbet': v["id_half_0_5_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"],"but":v["but"]},{"_id":0})):
+                filtre={'id_half_0_5_1xbet': v["id_half_0_5_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"],"but":v["but"]}
+                mise_a_jour={'$set':  {k: v[k] for k in v if k != 'id'}}
+                resultat= collection4.update_one(filtre, mise_a_jour)
+                if resultat.modified_count > 0:
+                    print("Mise à jour effectuée avec succès.")
+                else:
+                    print("Aucun document mis à jour.")
+            else:
+                resultat=collection4.insert_one(v)
+                inserted_id = resultat.inserted_id
+                print("Identifiant inséré :", inserted_id)
 
 
 
@@ -232,20 +253,26 @@ async def over_under_traitement(a,data1,a1,*args,**kwargs):
     inverse_sum = reduce(lambda x, y: x + (1 / y), t.values(), 0)
     print(t,inverse_sum)
 
-    if inverse_sum<0.99:
+    if inverse_sum<1:
+
         b["possible_surebet"]=t
         b["last_update"]=time.time()
         b["ratio"]=inverse_sum
         collection2=db_over_under["surebet"]
-        result = collection2.update_one(
-        {'id_half_0_5_1xbet': b["id_half_0_5_1xbet"],"market":b["market"],"events_1xbet":b["events_1xbet"],"but":b["but"]},
-        {'$set': b},
-        upsert=True
-        )# Vérification du résultat
-        if result.upserted_id:
-            print("Document inséré avec succès.")
+
+        collection2=db_over_under["surebet"]
+        if list(collection2.find({'id_half_0_5_1xbet': b["id_half_0_5_1xbet"],"market":b["market"],"events_1xbet":b["events_1xbet"],"but":b["but"]},{"_id":0})):
+            filtre={'id_half_0_5_1xbet': b["id_half_0_5_1xbet"],"market":b["market"],"events_1xbet":b["events_1xbet"],"but":b["but"]}
+            mise_a_jour={'$set':  {k: b[k] for k in b if k != 'id'}}
+            resultat= collection2.update_one(filtre, mise_a_jour)
+            if resultat.modified_count > 0:
+                print("Mise à jour effectuée avec succès.")
+            else:
+                print("Aucun document mis à jour.")
         else:
-            print("Document mis à jour avec succès.")
+            resultat=collection2.insert_one(b)
+            inserted_id = resultat.inserted_id
+            print("Identifiant inséré :", inserted_id)
         pprint(list(collection2.find({},{"_id":0})))
 
 
@@ -255,6 +282,8 @@ async def over_under_traitement(a,data1,a1,*args,**kwargs):
 
 #over_under_traitement(home_handicap=-4,away_handicap=4,G=3,T_home=7,T_away=8)
 async def over_under_recuperation(a):
+    global betkeen
+    global _1xbet
     Id = a["id_half_0_5_1xbet"]
     # Le lien ici est pour les matchs en direct (liveFeed)
     url = f"https://1xbet.mobi/LiveFeed/GetGameZip?id={Id}&lng=fr&tzo=2&isSubGames=true&GroupEvents=true&countevents=2500&grMode=2&country=182&marketType=1&mobi=true"
@@ -272,6 +301,10 @@ async def over_under_recuperation(a):
     except Exception as e:
         print(f'Probleme {e} au niveau de l api betkeen')
         return None
+    betkeen=data1["EventMarket"]
+    O1=data["Value"]["O1"]
+    O2=data["Value"]["O2"]
+    _1xbet=f"{O1} v {O2}"
     data1=data1["Selections"]
     if data1==[]:
         print("il n y a de data au niveau de l'api betkeen"  )
@@ -376,3 +409,9 @@ loop.run_until_complete(process_data_set(resultat, batch_size, max_concurrent_ta
 
 
 client.close()
+
+
+import gc
+gc.collect()
+
+sys.exit()

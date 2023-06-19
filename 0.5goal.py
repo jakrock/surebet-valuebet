@@ -20,6 +20,10 @@ import httpx
 import time
 import aiohttp
 from functools import reduce
+import sys
+#sys.stdout = open("NUL", "w")
+
+import uuid
 
 
 client=pymongo.MongoClient('localhost',27017)
@@ -142,6 +146,10 @@ async def over_under_traitement(a,data1,a1,*args,**kwargs):
     b=[]
     b=a.copy()
     #print(goal)
+
+    b["betkeen"]=betkeen
+    b["1xbet"]=1xbet
+    b["id"]=str(uuid.uuid4())
     over_betkeen=list(filter(lambda x: x["SelectionName"]==f"Over {goal} Goals",data1))[0]["Back1Odds"]
     under_betkeen=list(filter(lambda x: x["SelectionName"]==f"Under {goal} Goals",data1))[0]["Back1Odds"]
     
@@ -199,7 +207,8 @@ async def over_under_traitement(a,data1,a1,*args,**kwargs):
             collection3=db_over_under["valuebet"]
             result = collection3.update_one(
             {'id_0_5_1xbet': v["id_0_5_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"],"but":v["but"]},
-            {'$set': v},
+            {'$set':  {k: v[k] for k in v if k != 'id'}},
+            {'$setOnInsert': v},
             upsert=True
             )# Vérification du résultat
             if result.upserted_id:
@@ -208,7 +217,8 @@ async def over_under_traitement(a,data1,a1,*args,**kwargs):
             collection4=db_over_under["storage"]
             result = collection4.update_one(
             {'id_0_5_1xbet': v["id_0_5_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"],"but":v["but"]},
-            {'$set': v},
+            {'$set':  {k: v[k] for k in v if k != 'id'}},
+            {'$setOnInsert': v},
             upsert=True
             )# Vérification du résultat
             if result.upserted_id:
@@ -240,23 +250,13 @@ async def over_under_traitement(a,data1,a1,*args,**kwargs):
         b["ratio"]=inverse_sum
         collection2=db_over_under["surebet"]
         result = collection2.update_one(
-        {'id_0_5_1xbet': b["id_0_5_1xbet"],"market":b["market"]},
-        {'$set': b},
+        {'id_0_5_1xbet': b["id_0_5_1xbet"],"market":b["market"],"events_1xbet":b["events_1xbet"],"but":b["but"]},
+        {'$set': {k: b[k] for k in b if k != 'id'},'$setOnInsert': b},
         upsert=True
+
         )# Vérification du résultat
         if result.upserted_id:
             print("Document inséré avec succès.")
-            import pickle
-            # Sauvegarder la liste dans un fichier binaire
-            with open('nombre_surbet.pickle', 'rb') as f:
-                n=pickle.load(f)
-                n[0]+=1
-                n[1].append([b["ratio"],b["market"],b["possible_surebet"], b["events_1xbet"], b["events_betkeen"]])
-
-            # Sauvegarder la liste dans un fichier binaire
-            with open('nombre_surbet.pickle', 'wb') as f:
-                pickle.dump(n, f)
-
 
         else:
             print("Document mis à jour avec succès.")
@@ -286,6 +286,11 @@ async def over_under_recuperation(a):
     except Exception as e:
         print(f'Probleme {e} au niveau de l api betkeen')
         return None
+
+    betkeen=data1["EventMarket"]
+    O1=data["Value"]["O1"]
+    O2=data["value"]["O2"]
+    1xbet=f"{O1} v {O2}"
     data1=data1["Selections"]
     if data1==[]:
         print("il n y a de data au niveau de l'api betkeen"  )
@@ -302,11 +307,11 @@ async def over_under_recuperation(a):
     #print(a1)
 
 
-    #try:
-    await over_under_traitement(a,data1,a1,goal=0.5,G=4,over_T=9,under_T=10)
+    try:
+        await over_under_traitement(a,data1,a1,goal=0.5,G=4,over_T=9,under_T=10)
 
-    #except Exception as e :
-        #print(f"l erreur {e} est survenue lors de l execution de over_under_traitement")
+    except Exception as e :
+        print(f"l erreur {e} est survenue lors de l execution de over_under_traitement")
     
 #asyncio.run(over_under_recuperation(resultat[10]))
 
@@ -389,3 +394,10 @@ loop = asyncio.get_event_loop()
 loop.run_until_complete(process_data_set(resultat, batch_size, max_concurrent_tasks))
 
 
+
+client.close()
+
+import gc
+gc.collect()
+
+sys.exit()
