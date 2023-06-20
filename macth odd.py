@@ -338,6 +338,24 @@ async def match_odd_recuperation(a):
             resultat=collection2.insert_one(b)
             inserted_id = resultat.inserted_id
             print("Identifiant inséré :", inserted_id)
+
+
+        collection6 = db_match_odd["storage surebet"]
+
+
+        
+        if list(collection6.find({'id_1x2_1xbet': b["id_1x2_1xbet"],"market":b["market"],"events_1xbet":b["events_1xbet"]},{"_id":0})):
+            filtre={'id_1x2_1xbet': b["id_1x2_1xbet"],"market":b["market"],"events_1xbet":b["events_1xbet"]}
+            mise_a_jour={'$set':  {k: b[k] for k in b if k != 'id'}}
+            resultat= collection6.update_one(filtre, mise_a_jour)
+            if resultat.modified_count > 0:
+                print("Mise à jour effectuée avec succès.")
+            else:
+                print("Aucun document mis à jour.")
+        else:
+            resultat=collection6.insert_one(b)
+            inserted_id = resultat.inserted_id
+            print("Identifiant inséré :", inserted_id)
         pprint(list(collection2.find({}, {"_id": 0})))
     last_surebet()
     filtarage_surbet()

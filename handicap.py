@@ -183,7 +183,7 @@ async def handicap_Traitement(a, data1, a1, *args, **kwargs):
     p_home_handicap_betkeen=(1/home_handicap_betkeen)
     p_away_handicap_betkeen=(1/away_handicap_betkeen)
     marge=(p_away_handicap_betkeen+p_home_handicap_betkeen)-1
-    if marge<0.9 and home_handicap_betkeen<12 and away_handicap_betkeen<12:
+    if marge<0.18 and home_handicap_betkeen<12 and away_handicap_betkeen<12:
         m_home_handicap_betkeen=(2*home_handicap_betkeen)/(2-marge*home_handicap_betkeen)
         m_away_handicap_betkeen=(2*away_handicap_betkeen)/(2-marge*away_handicap_betkeen)
 
@@ -285,6 +285,25 @@ async def handicap_Traitement(a, data1, a1, *args, **kwargs):
                 print("Aucun document mis à jour.")
         else:
             resultat=collection2.insert_one(v)
+            inserted_id = resultat.inserted_id
+            print("Identifiant inséré :", inserted_id)
+
+
+
+
+        collection6=db_handicap["storage surebet"]
+
+
+        if list(collection6.find({'id_handicap_1xbet': v["id_handicap_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"],"h":v["h"],"a1":v["a1"]},{"_id":0})):
+            filtre={'id_handicap_1xbet': v["id_handicap_1xbet"],"market":v["market"],"events_1xbet":v["events_1xbet"],"h":v["h"],"a1":v["a1"]}
+            mise_a_jour={'$set':  {k: v[k] for k in v if k != 'id'}}
+            resultat= collection6.update_one(filtre, mise_a_jour)
+            if resultat.modified_count > 0:
+                print("Mise à jour effectuée avec succès.")
+            else:
+                print("Aucun document mis à jour.")
+        else:
+            resultat=collection6.insert_one(v)
             inserted_id = resultat.inserted_id
             print("Identifiant inséré :", inserted_id)
         pprint(list(collection2.find({},{"_id":0})))

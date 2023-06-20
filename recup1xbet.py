@@ -17,6 +17,11 @@ import pymongo
 import itertools
 
 
+import sys
+#sys.stdout = open("NUL", "w")
+
+
+
 
 client = pymongo.MongoClient("mongodb://localhost:27017/")
 db=client["info_macth_1xbet_live"]
@@ -117,4 +122,9 @@ subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\
 subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\traitement.py'])
 
 
-#client.close()
+client.close()
+
+import gc
+gc.collect()
+
+sys.exit()

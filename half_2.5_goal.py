@@ -276,8 +276,26 @@ async def over_under_traitement(a,data1,a1,*args,**kwargs):
             resultat=collection2.insert_one(b)
             inserted_id = resultat.inserted_id
             print("Identifiant inséré :", inserted_id)
+
+
+
+
+
+        collection6=db_over_under["storage surebet"]
+        if list(collection6.find({'id_half_2_5_1xbet': b["id_half_2_5_1xbet"],"market":b["market"],"events_1xbet":b["events_1xbet"],"but":b["but"]},{"_id":0})):
+            filtre={'id_half_2_5_1xbet': b["id_half_2_5_1xbet"],"market":b["market"],"events_1xbet":b["events_1xbet"],"but":b["but"]}
+            mise_a_jour={'$set':  {k: b[k] for k in b if k != 'id'}}
+            resultat= collection6.update_one(filtre, mise_a_jour)
+            if resultat.modified_count > 0:
+                print("Mise à jour effectuée avec succès.")
+            else:
+                print("Aucun document mis à jour.")
+        else:
+            resultat=collection6.insert_one(b)
+            inserted_id = resultat.inserted_id
+            print("Identifiant inséré :", inserted_id)
         pprint(list(collection2.find({},{"_id":0})))
-        pprint(list(collection2.find({},{"_id":0})))
+        
 
 
 

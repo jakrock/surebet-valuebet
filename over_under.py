@@ -187,7 +187,7 @@ async def over_under_traitement(betkeen,_1xbet,a,data1,a1,*args,**kwargs):
     p_over_betkeen = (1 / over_betkeen) 
     p_under_betkeen = (1 / under_betkeen) 
     marge =  (p_under_betkeen + p_over_betkeen)-1
-    if marge <0.09 and over_betkeen<9 and under_betkeen<9:
+    if marge <0.18 and over_betkeen<9 and under_betkeen<9:
         m_over_betkeen = (2 * over_betkeen) / (2 - marge * over_betkeen)
         m_under_betkeen = (2 * under_betkeen) / (2 - marge * under_betkeen)
 
@@ -304,6 +304,22 @@ async def over_under_traitement(betkeen,_1xbet,a,data1,a1,*args,**kwargs):
                 print("Aucun document mis à jour.")
         else:
             resultat=collection2.insert_one(b)
+            inserted_id = resultat.inserted_id
+            print("Identifiant inséré :", inserted_id)
+
+
+
+        collection6=db_over_under["storage surebet"]
+        if list(collection6.find({'id_over_under_1xbet': b["id_over_under_1xbet"],"market":b["market"],"events_1xbet":b["events_1xbet"],"but":b["but"]},{"_id":0})):
+            filtre={'id_over_under_1xbet': b["id_over_under_1xbet"],"market":b["market"],"events_1xbet":b["events_1xbet"],"but":b["but"]}
+            mise_a_jour={'$set':  {k: b[k] for k in b if k != 'id'}}
+            resultat= collection6.update_one(filtre, mise_a_jour)
+            if resultat.modified_count > 0:
+                print("Mise à jour effectuée avec succès.")
+            else:
+                print("Aucun document mis à jour.")
+        else:
+            resultat=collection6.insert_one(b)
             inserted_id = resultat.inserted_id
             print("Identifiant inséré :", inserted_id)
         pprint(list(collection2.find({},{"_id":0})))

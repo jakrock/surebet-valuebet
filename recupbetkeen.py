@@ -18,6 +18,10 @@ import httpx
 import requests
 from datetime import datetime
 import pickle
+
+import sys
+#sys.stdout = open("NUL", "w")
+
 import subprocess
 subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\cookiebetkeen.py'])
 def timestamp(x):
@@ -150,3 +154,14 @@ subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\
 subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\traitement.py'])
 
 client.close()
+
+
+
+
+
+
+
+import gc
+gc.collect()
+
+sys.exit()

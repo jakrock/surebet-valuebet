@@ -14,6 +14,10 @@ import itertools
 import datetime
 import subprocess
 
+import sys
+#sys.stdout = open("NUL", "w")
+
+
 def timestamp_to_date(timestamp):
     dt_object = datetime.datetime.fromtimestamp(timestamp)
     return dt_object.strftime("%d %b %Y %H:%M")
@@ -167,6 +171,11 @@ subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\
 client.close()
 
 
+
+import gc
+gc.collect()
+
+sys.exit()
 
 
 
