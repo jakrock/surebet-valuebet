@@ -80,12 +80,12 @@ async def main():
     scheduler = AsyncIOScheduler()
 
     # Planifiez l'exécution des fonctions avec un intervalle spécifique (par exemple, toutes les 5 secondes)
-    scheduler.add_job(main1, 'interval', seconds=25, max_instances=30)
-    scheduler.add_job(main2, 'interval', seconds=25, max_instances=30)
-    scheduler.add_job(main3, 'interval', seconds=25, max_instances=30)
-    scheduler.add_job(main4, 'interval', seconds=25, max_instances=30)
-    scheduler.add_job(main5, 'interval', seconds=25, max_instances=30)
-    scheduler.add_job(main6, 'interval', seconds=25, max_instances=30)
+    scheduler.add_job(main1, 'interval', seconds=18, max_instances=30)
+    scheduler.add_job(main2, 'interval', seconds=18, max_instances=30)
+    scheduler.add_job(main3, 'interval', seconds=18, max_instances=30)
+    scheduler.add_job(main4, 'interval', seconds=18, max_instances=30)
+    scheduler.add_job(main5, 'interval', seconds=18, max_instances=30)
+    scheduler.add_job(main6, 'interval', seconds=18, max_instances=30)
 
 
     # Démarrez le planificateur asyncio
