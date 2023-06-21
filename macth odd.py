@@ -181,6 +181,7 @@ async def match_odd_recuperation(a):
     except Exception as e:
         print(f'Probleme {e} au niveau de l api betkeen')
         return None
+    
     betkeen=data1["EventMarket"]
     O1=data["Value"]["O1"]
     O2=data["Value"]["O2"]

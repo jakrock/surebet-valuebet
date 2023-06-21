@@ -137,7 +137,7 @@ def filtarage_valuebet():
     db=client["finale"]
     collection=db["data supprimer"]
     for i in list(collection.find({},{'_id':0})) :
-        result=collection3.delete_one({'id':i["id"]})
+        result=collection3.delete_many({'id':i["id"]})
 
     temps=time.time()-2500
     result1=collection.delete_many({"last_update":{"$lt":temps}})
@@ -146,7 +146,7 @@ def filtarage_surbet():
     db=client["finale"]
     collection=db["data supprimer1"]
     for i in list(collection.find({},{'_id':0})) :
-        result=collection2.delete_one({'id':i["id"]})
+        result=collection2.delete_many({'id':i["id"]})
 
     temps=time.time()-2500
     result1=collection.delete_many({"last_update":{"$lt":temps}})
