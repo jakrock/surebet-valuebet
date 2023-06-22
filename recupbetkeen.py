@@ -23,7 +23,7 @@ import sys
 #sys.stdout = open("NUL", "w")
 
 import subprocess
-subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\cookiebetkeen.py'])
+subprocess.run(['python3', 'cookiebetkeen.py'])
 def timestamp(x):
     # Convertir la date en format datetime
     x=x.replace(":"," ")
@@ -72,7 +72,7 @@ def replace_i_display_length(url):
 
 
 contenu=''
-with open('C:\\Users\\fibou\\Desktop\\Dossier\\comparateur\\fichierajax.txt', "r") as fichier:
+with open('fichierajax.txt', "r") as fichier:
     contenu=str(fichier.read())
 # URL de la requête
 url = str(replace_i_display_length(contenu))
@@ -150,12 +150,10 @@ print((valeur))
 s=db.con.delete_many({})
 x=db.con.insert_one({"events":valeur})
 import subprocess 
-subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\donnee.py'])
-subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\traitement.py'])
+subprocess.run(['python3', 'donnee.py'])
+subprocess.run(['python3', 'traitement.py'])
 
 client.close()
-
-
 
 
 

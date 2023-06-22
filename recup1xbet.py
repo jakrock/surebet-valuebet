@@ -118,8 +118,8 @@ d=db.collection.insert_one({"event":list(resultat)})
 
 import subprocess
 
-subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\text.py'])
-subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\traitement.py'])
+subprocess.run(['python3', 'text.py'])
+subprocess.run(['python3', 'traitement.py'])
 
 
 client.close()

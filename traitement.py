@@ -150,18 +150,18 @@ print(len(d))
 
 
 
-subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\over_underModel.py'])
-subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\model1.py'])
-subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\handicapModel.py'])
-subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\over_under_0_5model.py'])
-subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\over_under_1_5model.py'])
-subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\half_0.5_model.py'])
-subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\half_1.5_model.py'])
-subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\half_2.5_model.py'])
-subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\halfmodel.py'])
-subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\over_under_2_5model.py'])
-subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\over_under_3.5_model.py'])
-subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\over_under_4.5_model.py'])
+subprocess.run(['python3', 'over_underModel.py'])
+subprocess.run(['python3', 'model1.py'])
+subprocess.run(['python3', 'handicapModel.py'])
+subprocess.run(['python3', 'over_under_0_5model.py'])
+subprocess.run(['python3', 'over_under_1_5model.py'])
+subprocess.run(['python3', 'half_0.5_model.py'])
+subprocess.run(['python3', 'half_1.5_model.py'])
+subprocess.run(['python3', 'half_2.5_model.py'])
+subprocess.run(['python3', 'halfmodel.py'])
+subprocess.run(['python3', 'over_under_2_5model.py'])
+subprocess.run(['python3', 'over_under_3.5_model.py'])
+subprocess.run(['python3', 'over_under_4.5_model.py'])
 
 
 

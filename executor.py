@@ -3,13 +3,16 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import time 
 import subprocess
 
+import sys
+#sys.stdout = open("NUL", "w")
+
 def task1():
     print("Exécution de la tâche 1")
-    subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\recup1xbet.py'])
+    subprocess.run(['python3', 'recup1xbet.py'])
 
 def task2():
     print("Exécution de la tâche 2")
-    subprocess.run(['python', 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\recupbetkeen.py'])
+    subprocess.run(['python3', 'recupbetkeen.py'])
     
 
 def main():
