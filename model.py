@@ -12,7 +12,7 @@ async def run_file1(file_path):
 async def main1():
     file_path =  'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\macth odd.py'
     output = await run_file1(file_path)
-    print(output)
+    #print(output)
 
 
 import asyncio
@@ -25,7 +25,7 @@ async def run_file2(file_path):
 async def main2():
     file_path = 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\over_under.py'
     output = await run_file2(file_path)
-    print(output)
+    #print(output)
 
 
 
@@ -37,7 +37,7 @@ async def run_file3(file_path):
 async def main3():
     file_path = 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\half.py'
     output = await run_file3(file_path)
-    print(output)
+    #print(output)
 
 
 async def run_file4(file_path):
@@ -48,7 +48,7 @@ async def run_file4(file_path):
 async def main4():
     file_path = 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\half_0.5_goal.py'
     output = await run_file4(file_path)
-    print(output)
+    #print(output)
 
 
 
@@ -60,7 +60,7 @@ async def run_file5(file_path):
 async def main5():
     file_path = 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\half_1.5_goal.py'
     output = await run_file5(file_path)
-    print(output)
+    #print(output)
 
 async def run_file6(file_path):
     process = await asyncio.create_subprocess_exec('python', file_path, stdout=asyncio.subprocess.PIPE)
@@ -70,7 +70,18 @@ async def run_file6(file_path):
 async def main6():
     file_path = 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\half_2.5_goal.py'
     output = await run_file6(file_path)
-    print(output)
+    #print(output)
+
+
+async def run_file7(file_path):
+    process = await asyncio.create_subprocess_exec('python', file_path, stdout=asyncio.subprocess.PIPE)
+    output, _ = await process.communicate()
+    return output.decode().strip()
+
+async def main7():
+    file_path = 'C:\\Users\\fibou\\Desktop\\Dossier\\comparateur_live\\handicap.py'
+    output = await run_file7(file_path)
+    #print(output)
 
 
 
@@ -86,6 +97,7 @@ async def main():
     scheduler.add_job(main4, 'interval', seconds=18, max_instances=30)
     scheduler.add_job(main5, 'interval', seconds=18, max_instances=30)
     scheduler.add_job(main6, 'interval', seconds=18, max_instances=30)
+    scheduler.add_job(main7, 'interval', seconds=18, max_instances=30)
 
 
     # Démarrez le planificateur asyncio
